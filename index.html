@@ -14,7 +14,7 @@
 </head>
 <body>
 <div id="app">
-    <input @focus="myfocus" autofocus ref="myinput" v-model="m"/>&nbsp;
+    <input @focus="myfocus" autofocus ref="myinput"/>&nbsp;
     <button @click="greet"><span style="color:green;font-size:1em">&nbsp;&nbsp;&nbsp; ▶ &nbsp;&nbsp;&nbsp;</span>
     </button>&nbsp;
     <button @click="clear_input"><span style="color:red;font-size:1em">&nbsp;&nbsp;&nbsp; 🗑 &nbsp;&nbsp;&nbsp;</span>
@@ -25,14 +25,13 @@
     const {createApp} = Vue;
     createApp({
         data() {
-            return {m: '', r: ''}
+            return {r: ''}
         },
         methods: {
             clear_input(event) {
-                if (this.m === '') {
+                if (this.$refs.myinput.value === '') {
                     this.r = '';
                 }
-                this.m = '';
                 this.$refs.myinput.value = '';
                 this.$refs.myinput.focus();
             },
@@ -45,12 +44,12 @@
             greet(event) {
                 this.r = 'waiting...';
                 let f = new FormData();
-                f.append('m', this.m);
+                f.append('m', this.$refs.myinput.value);
                 f.append('k', localStorage.getItem('k'));
                 let apiurl = localStorage.getItem('apiurl');
                 if (apiurl === null) {
                     localStorage.setItem('apiurl', this.m);
-                    this.r = this.m;
+                    this.r = this.$refs.myinput.value;
                 } else {
                     axios.post(apiurl, f).then(response => {
                         if (typeof response.data === 'string' && response.data.startsWith('k:')) {
