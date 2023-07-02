@@ -20,8 +20,7 @@
     <button @click="clear_input"><span style="color:red;font-size:1em">&nbsp;&nbsp;&nbsp; 🗑 &nbsp;&nbsp;&nbsp;</span>
     </button>
     <p>{{ r }}</p>
-</div>
-<script>
+    <script>
     const {createApp} = Vue;
     createApp({
         data() {
@@ -42,16 +41,25 @@
                 }
             },
             greet(event) {
-                this.r = 'waiting...';
+                this.r = 'sending...';
                 let f = new FormData();
                 f.append('m', this.$refs.myinput.value);
                 f.append('k', localStorage.getItem('k'));
                 let apiurl = localStorage.getItem('apiurl');
                 if (apiurl === null) {
-                    localStorage.setItem('apiurl', this.m);
+                    localStorage.setItem('apiurl', this.$refs.myinput.value);
                     this.r = this.$refs.myinput.value;
                 } else {
-                    axios.post(apiurl, f).then(response => {
+                    let myThis = this;
+                    let neverRun = true;
+                    axios.post(apiurl, f, {
+                        onUploadProgress: function (progressEvent) {
+                            if(neverRun){
+                                neverRun = false;
+                                myThis.r = 'waiting...';
+                            }
+                        }
+                    }).then(response => {
                         if (typeof response.data === 'string' && response.data.startsWith('k:')) {
                             localStorage.setItem('k', response.data);
                             this.r = 'ok';
@@ -64,5 +72,6 @@
         }
     }).mount('#app')
 </script>
+</div>
 </body>
 </html>
